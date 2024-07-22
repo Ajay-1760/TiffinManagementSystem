@@ -1,0 +1,30 @@
+Step 1: create database image
+docker build -t ajay1760/database .
+
+step 2: create frontend image
+docker build -t ajay1760/frontend .
+
+Step 3: create image of spring boot app using Dockerfile present there.....or else i have uploaded already builded image on dockerhub having name "ajay1760/backend".
+(NOTE : if you have created your own imge then replace at all below steps  "ajay1760/backend" by ur image name )
+docker build -t ajay1760/backend .
+
+Steps on aws are as below
+sudo apt-get install docker.io
+
+//to start docker
+sudo service docker start
+
+//to solver issue: Got permission denied issue on docker.sock
+sudo chmod 666 /var/run/docker.sock
+
+docker image pull ajay1760/database
+
+docker image pull ajay1760/backend
+
+docker network create springmysql-net
+
+docker run --name mysqldb --network springmysql-net -e MYSQL_ROOT_PASSWORD=manager -d ajay1760/database
+
+docker run --network springmysql-net --name backend-container -p 8082:8082 -d ajay1760/backend
+
+docker run  --name frontend-container -p 80:80 -d ajay1760/frontend

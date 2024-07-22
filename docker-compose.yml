@@ -1,0 +1,28 @@
+version: '3'
+services:
+  mysqldb:
+    container_name: mysqldb
+    build: ./database/
+    volumes:
+      - myapp:/var/lib/mysql
+  
+  backend:
+    container_name: backend
+    build: ./backend/TiffinManagementBackend/
+    depends_on:
+      - mysqldb
+
+  frontend:
+    container_name: frontend
+    build: ./frontend/aahar/
+    volumes:
+      - mymodule:/node_modules
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+
+volumes:
+  myapp:
+  mymodule:
+    
