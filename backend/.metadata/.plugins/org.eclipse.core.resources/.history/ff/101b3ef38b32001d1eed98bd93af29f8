@@ -1,0 +1,83 @@
+package com.app.controller;
+
+import java.util.Map;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import com.app.dtos.Credential;
+import com.app.dtos.Response;
+import com.app.dtos.UserDto;
+import com.app.entities.User;
+import com.app.services.UserService;
+
+@CrossOrigin(origins = "*")
+@RestController
+public class UserController {
+	@Autowired
+	private UserService userService;
+
+	@Autowired(required = true)
+	private ModelMapper mapper;
+	
+	@PostMapping("/user/{id}")
+	public ResponseEntity<?> displayUserById(@PathVariable("id") int id) {
+		UserDto userDto = userService.findUserById(id);
+		return Response.success(userDto);
+	}
+
+	@PostMapping("/user/signin")
+	public ResponseEntity<?> Signin(@RequestBody Credential cred) {
+		UserDto userDto = userService.findUserByEmailAndPassword(cred);
+		if (userDto == null)
+			Response.error("Incorrect Username and Password");
+		return Response.success(userDto);
+	}
+
+	@PostMapping("/user/signup")
+	public ResponseEntity<?> Signup(@RequestBody UserDto userdto) {
+		User persistentUser = userService.AddUser(userdto);
+		UserDto result = mapper.map(persistentUser,UserDto.class);
+		if (result == null)
+			return Response.error("Something wrong happened");
+		return Response.success(result);
+	}
+
+	@PostMapping("/DeliveryBoys")
+	public ResponseEntity<?> findalldeliveryBoys() {
+		return Response.success(userService.DeliveryBoysList());
+	}
+
+	@DeleteMapping("/DeliveryBoys/Delete/{userId}")
+	public ResponseEntity<?> deleteDeliveryboy(@PathVariable("userId") int userId) {
+		System.out.println("userId : "+userId);
+		User deletedUser = userService.DeleteUser(userId);
+		System.out.println(deletedUser);
+		UserDto deletedUDto = mapper.map(deletedUser, UserDto.class);
+		return Response.success(deletedUDto);
+	}
+
+	@GetMapping("/CustomerList")
+	public ResponseEntity<?> getAllCustomers() {
+		return Response.success(userService.getAllCustomers());
+	}
+
+	@PutMapping("/user/edit")
+	public ResponseEntity<?> editUser(@RequestBody UserDto dto) {
+		Map<String, Object> result = userService.editUser(dto.getUserId(), dto);
+		return Response.success(result);
+	}
+
+	@GetMapping("/user/roles")
+	public ResponseEntity<?> getAllRoles() {
+		return Response.success(userService.getUserRoles());
+	}
+}

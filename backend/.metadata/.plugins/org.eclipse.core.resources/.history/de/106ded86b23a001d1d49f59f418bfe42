@@ -1,0 +1,26 @@
+
+version: "3.8"
+services:
+  server:
+    image: backend
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      - SLEEP_LENGTH=5
+      - jdbc:mysql://mysqldb:3306/main_project?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    networks:
+      - springmysql-net
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:8
+    restart: always
+    networks:
+      - springmysql-net
+    environment:
+      - MYSQL_ROOT_PASSWORD=manager
+
+networks:
+  springmysql-net:
